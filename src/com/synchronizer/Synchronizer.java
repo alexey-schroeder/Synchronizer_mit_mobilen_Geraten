@@ -27,8 +27,10 @@ public class Synchronizer {
 
     public void start() throws IOException {
         ServerSocket serverSocket = new ServerSocket(port);
+        System.out.println("SocketServer startet on port " + port);
         while(true){
             Socket client = serverSocket.accept();
+            System.out.println("New Connection");
             LoginChecker loginChecker = new LoginChecker(client, topicToSocketBrocker);
             loginChecker.start();
         }

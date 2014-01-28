@@ -42,7 +42,7 @@ public class TopicToSocketBrocker {
 
     private void removeMobileClient(String clientId) {
         Consumer consumer = consumers.get(clientId);
-        consumer.stop();
+        consumer.breakJob();
         consumers.remove(clientId);
 
         mobileClients.remove(clientId);
@@ -58,8 +58,10 @@ public class TopicToSocketBrocker {
         consumer.setTopicToSocketBrocker(this);
         consumers.put(id, consumer);
         mobileClients.put(id, clientWithSocket);
+        clientWithSocket.setTopicToSocketBrocker(this);
         clientWithSocket.start();
         consumer.start();
+        System.out.println("New client added. Client id = " + id);
     }
 
     public void setSecurityInspector(SecurityInspector securityInspector) {
@@ -69,10 +71,11 @@ public class TopicToSocketBrocker {
     public void writeMessageInTopic(String message, String clientId) throws JMSException {
         if (securityInspector.canClientWriteInTopic(clientId)) {
             producer.send(message);
+            System.out.println("topicToSocket brocker hat in Topic folgendes Message gepostet: \n" + message);
         }
     }
 
-    public void writeMessageToSocket(String clientId, String message) {
+    public void writeMessageInSocket(String clientId, String message) {
         if (securityInspector.canClientReadFromTopic(clientId)) {
             mobileClients.get(clientId).writeMessage(message);
         }

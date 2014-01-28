@@ -1,5 +1,8 @@
 package com.client;
 
+import com.topicAgent.TopicToSocketBrocker;
+
+import javax.jms.JMSException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -19,10 +22,11 @@ public class MobileClientWithSocket extends Thread{
     Socket socket;
     private BufferedReader data_in;
     private PrintWriter data_out;
-    private char EOF = (char) 0x00;
+    private String EOF = "\n";
     private boolean quit;
     private String id;
     private boolean breaked;
+    private TopicToSocketBrocker topicToSocketBrocker;
 
     public MobileClientWithSocket(Socket socket) {
         this.socket = socket;
@@ -73,8 +77,16 @@ public class MobileClientWithSocket extends Thread{
         while(!breaked){
             String message = readMessage();
             if(!breaked){
-
+                try {
+                    topicToSocketBrocker.writeMessageInTopic(message, id);
+                } catch (JMSException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
             }
         }
+    }
+
+    public void setTopicToSocketBrocker(TopicToSocketBrocker topicToSocketBrocker) {
+        this.topicToSocketBrocker = topicToSocketBrocker;
     }
 }
