@@ -7,6 +7,7 @@ import javax.jms.JMSException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
 
 /**
@@ -19,6 +20,15 @@ import java.net.Socket;
 public class LoginChecker extends Thread {
     private Socket socket;
     private TopicToSocketBrocker topicAgent;
+    private String loginOkAnswerTemplate =  "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+            "<message>" +
+            "       <result>success</result>" +
+            "       <id>{$id}</id>" +
+            "   </message>";
+    private String loginFailedAnswerTemplate =  "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+            "<message>" +
+            "       <result>failed</result>" +
+            "   </message>";
     public LoginChecker(Socket socket, TopicToSocketBrocker topicAgent) {
         this.socket = socket;
         this.topicAgent = topicAgent;
@@ -31,8 +41,17 @@ public class LoginChecker extends Thread {
             String loginInfo = reader.readLine();
             if(checkLogin(loginInfo)){
                 String id = getIdFromLoginInfo(loginInfo);
+                PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
                if(!topicAgent.hasClientWithId(id)){
-                   topicAgent.addClient(new MobileClientWithSocket(socket));
+                   out.println(loginOkAnswerTemplate.replace("{$id}", id));
+                   out.flush();
+                   MobileClientWithSocket mobileClientWithSocket = new MobileClientWithSocket(socket);
+                   mobileClientWithSocket.setMobileClientId(id);
+                   topicAgent.addClient(mobileClientWithSocket);
+               } else {
+                   out.println(loginFailedAnswerTemplate);
+                   out.flush();
+                   out.close();
                }
             }
         } catch (IOException e) {
@@ -43,7 +62,7 @@ public class LoginChecker extends Thread {
     }
 
     private String getIdFromLoginInfo(String loginInfo) {
-        return "1";
+        return "2";
     }
 
     private boolean checkLogin(String loginInfo){
