@@ -22,11 +22,11 @@ public class MobileClientWithSocket extends Thread{
     Socket socket;
     private BufferedReader data_in;
     private PrintWriter data_out;
-    private String EOF = "\n";
     private boolean quit;
     private String id;
     private boolean breaked;
     private TopicToSocketBrocker topicToSocketBrocker;
+    public static int idCounter;
 
     public MobileClientWithSocket(Socket socket) {
         this.socket = socket;
@@ -56,7 +56,7 @@ public class MobileClientWithSocket extends Thread{
     }
 
     public void writeMessage(String message) {
-        data_out.println(message + EOF);
+        data_out.println(message);
         data_out.flush();
     }
 

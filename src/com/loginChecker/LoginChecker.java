@@ -1,6 +1,8 @@
 package com.loginChecker;
 
 import com.client.MobileClientWithSocket;
+import com.messages.Message;
+import com.parsers.XMLParser;
 import com.topicAgent.TopicToSocketBrocker;
 
 import javax.jms.JMSException;
@@ -23,7 +25,6 @@ public class LoginChecker extends Thread {
     private String loginOkAnswerTemplate =  "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
             "<message>" +
             "       <result>success</result>" +
-            "       <id>{$id}</id>" +
             "   </message>";
     private String loginFailedAnswerTemplate =  "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
             "<message>" +
@@ -43,7 +44,7 @@ public class LoginChecker extends Thread {
                 String id = getIdFromLoginInfo(loginInfo);
                 PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
                if(!topicAgent.hasClientWithId(id)){
-                   out.println(loginOkAnswerTemplate.replace("{$id}", id));
+                   out.println(loginOkAnswerTemplate);
                    out.flush();
                    MobileClientWithSocket mobileClientWithSocket = new MobileClientWithSocket(socket);
                    mobileClientWithSocket.setMobileClientId(id);
@@ -62,7 +63,8 @@ public class LoginChecker extends Thread {
     }
 
     private String getIdFromLoginInfo(String loginInfo) {
-        return "2";
+        Message message= XMLParser.getMessageFromXML(loginInfo);
+        return  message.get("login");
     }
 
     private boolean checkLogin(String loginInfo){

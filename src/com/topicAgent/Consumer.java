@@ -9,7 +9,7 @@ import javax.jms.*;
 public class Consumer  extends Thread{
     // URL of the JMS server
     private static String url = ActiveMQConnection.DEFAULT_BROKER_URL;
-    private static String id = "Consumer_1";
+    private  String id;
     // Name of the queue we will receive messages from
     private static String subject = "Werkstatt1";
     private boolean breaked;
@@ -39,7 +39,7 @@ public class Consumer  extends Thread{
                 if (!breaked && jmsMessage instanceof TextMessage) { // weil in receive hängt der client, bracked kann kommen, aber der client bekommt es nicht mit
                     TextMessage textMessage = (TextMessage) jmsMessage;
                     com.messages.Message message = XMLParser.getMessageFromXML(textMessage.getText());
-                    if (id.equals(message.get("id"))) {
+                    if (id.equals(message.get("idTo"))) {
                         topicToSocketBrocker.writeMessageInSocket(id, textMessage.getText());
                     }
                 }
