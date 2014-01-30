@@ -14,7 +14,8 @@ public class Consumer  extends Thread{
     private static String subject = "Werkstatt1";
     private boolean breaked;
     private TopicToSocketBrocker topicToSocketBrocker;
-
+    private Session session;
+    private Connection connection;
     public Consumer(String id) {
         this.id = id;
     }
@@ -22,13 +23,11 @@ public class Consumer  extends Thread{
     public void run()  {
         ConnectionFactory connectionFactory
                 = new ActiveMQConnectionFactory(url);
-        Connection connection = null;
         try {
             connection = connectionFactory.createConnection();
             connection.setClientID(id);
             connection.start();
-
-            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
             Topic destination = session.createTopic(subject);
 
@@ -57,6 +56,11 @@ public class Consumer  extends Thread{
 
     public void breakJob() {
         breaked = true;
+        try {
+            connection.close();
+        } catch (JMSException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
     }
 
     public void setTopicToSocketBrocker(TopicToSocketBrocker topicToSocketBrocker) {

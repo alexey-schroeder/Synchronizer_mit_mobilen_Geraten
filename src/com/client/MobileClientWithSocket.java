@@ -8,8 +8,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Created with IntelliJ IDEA.
@@ -24,7 +22,6 @@ public class MobileClientWithSocket extends Thread{
     private PrintWriter data_out;
     private boolean quit;
     private String id;
-    private boolean breaked;
     private TopicToSocketBrocker topicToSocketBrocker;
     public static int idCounter;
 
@@ -50,7 +47,6 @@ public class MobileClientWithSocket extends Thread{
             }
         } catch (IOException ex) {
             quit = true;
-            Logger.getLogger(MobileClientWithSocket.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }
@@ -69,14 +65,22 @@ public class MobileClientWithSocket extends Thread{
     }
 
     public boolean  isOnline(){
-       return !data_out.checkError();
+        try {
+            int ping = data_in.read();
+            if(ping == -1){
+                return false;
+            }
+        } catch (IOException e) {
+           return false;
+        }
+        return true;
     }
 
     @Override
     public void run() {
-        while(!breaked){
+        while(!quit){
             String message = readMessage();
-            if(!breaked){
+            if(!quit){
                 try {
                     topicToSocketBrocker.writeMessageInTopic(message, id);
                 } catch (JMSException e) {
@@ -84,6 +88,7 @@ public class MobileClientWithSocket extends Thread{
                 }
             }
         }
+        topicToSocketBrocker.removeMobileClient(id);
     }
 
     public void setTopicToSocketBrocker(TopicToSocketBrocker topicToSocketBrocker) {

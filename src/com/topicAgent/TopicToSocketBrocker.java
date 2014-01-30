@@ -40,12 +40,12 @@ public class TopicToSocketBrocker {
         }
     }
 
-    private void removeMobileClient(String clientId) {
+    public void removeMobileClient(String clientId) {
         Consumer consumer = consumers.get(clientId);
         consumer.breakJob();
         consumers.remove(clientId);
-
         mobileClients.remove(clientId);
+        System.out.println("Client " + clientId + " disconected");
     }
 
     private boolean isClientOnline(String clientId) {
