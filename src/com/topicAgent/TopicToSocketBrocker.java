@@ -28,16 +28,7 @@ public class TopicToSocketBrocker {
 
     public boolean hasClientWithId(String id) {
         MobileClientWithSocket mobileClientWithSocket = mobileClients.get(id);
-        if (mobileClientWithSocket == null) {
-            return false;
-        }
-        boolean isClientOnLine = isClientOnline(mobileClientWithSocket.getMobileClientId());
-        if (isClientOnLine) {
-            return true;
-        } else { // client ist nicht mehr online, socket ist nicht  aktiv
-            removeMobileClient(id);
-            return false;
-        }
+      return  mobileClientWithSocket != null;
     }
 
     public void removeMobileClient(String clientId) {
@@ -48,13 +39,9 @@ public class TopicToSocketBrocker {
         System.out.println("Client " + clientId + " disconected");
     }
 
-    private boolean isClientOnline(String clientId) {
-        return mobileClients.get(clientId).isOnline();
-    }
-
     public void addClient(MobileClientWithSocket clientWithSocket) throws JMSException {
         String id = clientWithSocket.getMobileClientId();
-        Consumer consumer = new Consumer(clientWithSocket.getMobileClientId());
+        Consumer consumer = new Consumer(id);
         consumer.setTopicToSocketBrocker(this);
         consumers.put(id, consumer);
         mobileClients.put(id, clientWithSocket);

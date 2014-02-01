@@ -38,6 +38,6 @@ public class Producer {
 
     public void send(String text) throws JMSException {
         TextMessage message = session.createTextMessage(text);
-        producer.send(message, DeliveryMode.PERSISTENT, 9, 1000);
+        producer.send(message, DeliveryMode.PERSISTENT, 9, -1);  // wichtig: -1 steht für die zeit von lebendauer der nachricht!
     }
 }

@@ -43,7 +43,6 @@ public class MobileClientWithSocket extends Thread{
                 return message.trim();
             } else {
                 quit = true;
-                return message;
             }
         } catch (IOException ex) {
             quit = true;
@@ -62,18 +61,6 @@ public class MobileClientWithSocket extends Thread{
 
     public void setMobileClientId(String id) {
         this.id = id;
-    }
-
-    public boolean  isOnline(){
-        try {
-            int ping = data_in.read();
-            if(ping == -1){
-                return false;
-            }
-        } catch (IOException e) {
-           return false;
-        }
-        return true;
     }
 
     @Override

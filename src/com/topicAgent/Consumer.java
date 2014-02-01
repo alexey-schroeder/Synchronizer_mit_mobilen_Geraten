@@ -12,10 +12,11 @@ public class Consumer  extends Thread{
     private  String id;
     // Name of the queue we will receive messages from
     private static String subject = "Werkstatt1";
-    private boolean breaked;
+    private boolean quit;
     private TopicToSocketBrocker topicToSocketBrocker;
     private Session session;
     private Connection connection;
+    private MessageConsumer consumer;
     public Consumer(String id) {
         this.id = id;
     }
@@ -31,11 +32,14 @@ public class Consumer  extends Thread{
 
             Topic destination = session.createTopic(subject);
 
-            MessageConsumer consumer = session.createDurableSubscriber(destination, id);
+            consumer = session.createDurableSubscriber(destination, id);
 
-            while (!breaked) {
+            while (!quit) {
                 Message jmsMessage = consumer.receive();
-                if (!breaked && jmsMessage instanceof TextMessage) { // weil in receive hängt der client, bracked kann kommen, aber der client bekommt es nicht mit
+                if(jmsMessage != null){
+                System.out.println("aus topic wurde von consumer mit id = " + id + " folgendes message gelesen" +((TextMessage) jmsMessage).getText());
+                }
+                if (!quit && jmsMessage instanceof TextMessage) { // weil in receive hängt der client, bracked kann kommen, aber der client bekommt es nicht mit
                     TextMessage textMessage = (TextMessage) jmsMessage;
                     com.messages.Message message = XMLParser.getMessageFromXML(textMessage.getText());
                     if (id.equals(message.get("idTo"))) {
@@ -55,9 +59,13 @@ public class Consumer  extends Thread{
     }
 
     public void breakJob() {
-        breaked = true;
+        quit = true;
         try {
-            connection.close();
+            connection.stop();
+            consumer.close();
+            session.close();
+//            connection.stop();
+//            connection.close();
         } catch (JMSException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
