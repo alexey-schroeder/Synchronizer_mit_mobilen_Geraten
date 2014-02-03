@@ -8,9 +8,9 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         SecurityInspector securityInspector = new SecurityInspector();
-        TopicToSocketBrocker topicToSocketBrocker = new TopicToSocketBrocker();
+        TopicToSocketBrocker topicToSocketBrocker = TopicToSocketBrocker.getInstance();
         topicToSocketBrocker.setSecurityInspector(securityInspector);
-        Synchronizer synchronizer = new Synchronizer(1111);
+        Synchronizer synchronizer = new Synchronizer(1111, 2222);
         synchronizer.setTopicToSocketBrocker(topicToSocketBrocker);
         synchronizer.start();
     }

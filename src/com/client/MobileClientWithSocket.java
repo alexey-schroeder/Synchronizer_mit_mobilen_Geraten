@@ -1,7 +1,5 @@
 package com.client;
 
-import com.topicAgent.TopicToSocketBrocker;
-
 import javax.jms.JMSException;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,13 +14,11 @@ import java.net.Socket;
  * Time: 21:51
  * To change this template use File | Settings | File Templates.
  */
-public class MobileClientWithSocket extends Thread{
-    Socket socket;
+public class MobileClientWithSocket extends MobileClient{
+    private Socket socket;
     private BufferedReader data_in;
     private PrintWriter data_out;
-    private boolean quit;
-    private String id;
-    private TopicToSocketBrocker topicToSocketBrocker;
+
     public static int idCounter;
 
     public MobileClientWithSocket(Socket socket) {
@@ -55,14 +51,6 @@ public class MobileClientWithSocket extends Thread{
         data_out.flush();
     }
 
-    public String getMobileClientId() {
-        return id;
-    }
-
-    public void setMobileClientId(String id) {
-        this.id = id;
-    }
-
     @Override
     public void run() {
         while(!quit){
@@ -75,10 +63,6 @@ public class MobileClientWithSocket extends Thread{
                 }
             }
         }
-        topicToSocketBrocker.removeMobileClient(id);
-    }
-
-    public void setTopicToSocketBrocker(TopicToSocketBrocker topicToSocketBrocker) {
-        this.topicToSocketBrocker = topicToSocketBrocker;
+        topicToSocketBrocker.removeMobileClient(id, this);
     }
 }

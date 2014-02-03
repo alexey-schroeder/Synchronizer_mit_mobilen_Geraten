@@ -28,6 +28,7 @@ public class Producer {
     }
 
     public void start() throws JMSException {
+        System.out.println("Starte producer for ActiveMQ");
         ConnectionFactory connectionFactory =  new ActiveMQConnectionFactory(url);
         Connection connection = connectionFactory.createConnection();
         connection.start();

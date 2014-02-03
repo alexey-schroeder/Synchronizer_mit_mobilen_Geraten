@@ -1,10 +1,12 @@
 package com.topicAgent;
 
-import com.client.MobileClientWithSocket;
+import com.client.MobileClient;
 import com.security.SecurityInspector;
 
 import javax.jms.JMSException;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,40 +17,63 @@ import java.util.HashMap;
  */
 public class TopicToSocketBrocker {
     private Producer producer;
-    private HashMap<String, MobileClientWithSocket> mobileClients;
+    private HashMap<String, Set<MobileClient>> mobileClients;
     private HashMap<String, Consumer> consumers;
     private SecurityInspector securityInspector;
+    private static TopicToSocketBrocker instance;
 
-    public TopicToSocketBrocker() throws JMSException {
+    public static synchronized TopicToSocketBrocker getInstance(){
+        if (instance == null) {
+            try {
+                instance = new TopicToSocketBrocker();
+            } catch (JMSException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+        }
+        return instance;
+    }
+
+    private TopicToSocketBrocker() throws JMSException {
         producer = new Producer();
         producer.start();
-        mobileClients = new HashMap<String, MobileClientWithSocket>();
+        mobileClients = new HashMap<String, Set<MobileClient>>();
         consumers = new HashMap<String, Consumer>();
     }
 
     public boolean hasClientWithId(String id) {
-        MobileClientWithSocket mobileClientWithSocket = mobileClients.get(id);
-      return  mobileClientWithSocket != null;
+        Set<MobileClient> clients = mobileClients.get(id);
+        return clients != null && !clients.isEmpty();
     }
 
-    public void removeMobileClient(String clientId) {
-        Consumer consumer = consumers.get(clientId);
-        consumer.breakJob();
-        consumers.remove(clientId);
-        mobileClients.remove(clientId);
+    public void removeMobileClient(String clientId, MobileClient mobileClient) {
+        Set<MobileClient> clients = mobileClients.get(clientId);
+        if (clients != null) {
+            clients.remove(mobileClient);
+            if (clients.isEmpty()) {
+                Consumer consumer = consumers.get(clientId);
+                consumer.breakJob();
+                consumers.remove(clientId);
+            }
+        }
         System.out.println("Client " + clientId + " disconected");
     }
 
-    public void addClient(MobileClientWithSocket clientWithSocket) throws JMSException {
-        String id = clientWithSocket.getMobileClientId();
-        Consumer consumer = new Consumer(id);
-        consumer.setTopicToSocketBrocker(this);
-        consumers.put(id, consumer);
-        mobileClients.put(id, clientWithSocket);
-        clientWithSocket.setTopicToSocketBrocker(this);
-        clientWithSocket.start();
-        consumer.start();
-        System.out.println("New client added. Client id = " + id);
+    public void addClient(MobileClient client) throws JMSException {
+        String clientId = client.getMobileClientId();
+        Set<MobileClient> clients = mobileClients.get(clientId);
+        if (clients == null) {
+            Consumer consumer = new Consumer(clientId);
+            consumer.setTopicToSocketBrocker(this);
+            consumers.put(clientId, consumer);
+            consumer.start();
+            clients = new HashSet<MobileClient>();
+            mobileClients.put(clientId, clients);
+        }
+        clients.add(client);
+        client.setTopicToSocketBrocker(this);
+        client.start();
+
+        System.out.println("New client added. Client id = " + clientId);
     }
 
     public void setSecurityInspector(SecurityInspector securityInspector) {
@@ -64,7 +89,10 @@ public class TopicToSocketBrocker {
 
     public void writeMessageInSocket(String clientId, String message) {
         if (securityInspector.canClientReadFromTopic(clientId)) {
-            mobileClients.get(clientId).writeMessage(message);
+            Set<MobileClient> allClients = mobileClients.get(clientId);
+            for (MobileClient mobileClient : allClients) {
+                mobileClient.writeMessage(message);
+            }
         }
     }
 }
