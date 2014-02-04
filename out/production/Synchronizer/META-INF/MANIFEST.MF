@@ -1,3 +1,4 @@
 Manifest-Version: 1.0
+Class-Path: lib/activemq-all-5.9.0.jar lib/grizzly-framework-2.3.3.jar lib/grizzly-http-2.3.3.jar lib/grizzly-http-server-2.3.3.jar lib/javax.websocket-api-1.0.jar lib/tyrus-container-grizzly-1.1.jar lib/tyrus-core-1.1.jar lib/tyrus-server-1.1.jar lib/tyrus-spi-1.1.jar lib/tyrus-websocket-core-1.1.jar
 Main-Class: com.Main
 
