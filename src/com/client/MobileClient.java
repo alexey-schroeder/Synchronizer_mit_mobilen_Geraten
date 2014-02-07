@@ -10,6 +10,10 @@ import com.topicAgent.TopicToSocketBrocker;
  * To change this template use File | Settings | File Templates.
  */
 public abstract class MobileClient extends Thread {
+    public static String notValidMessageTemplate = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+            "<message>" +
+            "<error>NotValidXMLException</error>" +
+            "</message>";
     protected boolean quit;
     protected String id;
     protected TopicToSocketBrocker topicToSocketBrocker;

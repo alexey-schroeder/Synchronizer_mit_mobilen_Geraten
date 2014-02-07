@@ -1,6 +1,8 @@
 package com.loginChecker;
 
+import com.client.MobileClient;
 import com.client.MobileClientWithWebSocket;
+import com.parsers.XMLParser;
 import com.synchronizer.WebSocketServerEndPoint;
 import com.topicAgent.TopicToSocketBrocker;
 
@@ -34,6 +36,10 @@ public class WebSocketLoginChecker extends LoginChecker {
 
     @Override
     public void run() {
+        if(!XMLParser.isValid(loginInfo)){
+            webSocketSession.getAsyncRemote().sendText(MobileClient.notValidMessageTemplate);
+            return;
+        }
         if (checkLogin(loginInfo)) {
             String id = getIdFromLoginInfo(loginInfo);
             webSocketSession.getAsyncRemote().sendText(loginOkAnswerTemplate);

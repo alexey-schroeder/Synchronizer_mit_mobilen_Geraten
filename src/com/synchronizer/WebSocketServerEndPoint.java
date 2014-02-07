@@ -1,7 +1,9 @@
 package com.synchronizer;
 
+import com.client.MobileClient;
 import com.client.MobileClientWithWebSocket;
 import com.loginChecker.WebSocketLoginChecker;
+import com.parsers.XMLParser;
 import com.topicAgent.TopicToSocketBrocker;
 
 import javax.jms.JMSException;
@@ -31,7 +33,7 @@ public class WebSocketServerEndPoint {
     @OnOpen
     public void onOpen(Session session, EndpointConfig conf) {
         this.session = session;
-        System.out.println("websocket session opened");
+        System.out.println("websocket session opened: " + session);
     }
 
     @OnMessage
@@ -45,7 +47,11 @@ public class WebSocketServerEndPoint {
             webSocketLoginChecker.start();
         } else if (isLoged) {
             try {
+                if(XMLParser.isValid(text)){
                 TopicToSocketBrocker.getInstance().writeMessageInTopic(text, clientId);
+                } else {
+                    session.getAsyncRemote().sendText(MobileClient.notValidMessageTemplate);
+                }
             } catch (JMSException e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
@@ -55,6 +61,7 @@ public class WebSocketServerEndPoint {
     @OnClose
     public void onClose(Session session) {
         try {
+            System.out.println("Session for client " + clientId + " closed");
             TopicToSocketBrocker.getInstance().removeMobileClient(clientId, clientWithWebSocket);
             session.close();
         } catch (IOException e) {

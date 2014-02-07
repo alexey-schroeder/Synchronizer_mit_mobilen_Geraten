@@ -1,5 +1,7 @@
 package com.client;
 
+import com.parsers.XMLParser;
+
 import javax.jms.JMSException;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -57,7 +59,11 @@ public class MobileClientWithSocket extends MobileClient{
             String message = readMessage();
             if(!quit){
                 try {
-                    topicToSocketBrocker.writeMessageInTopic(message, id);
+                    if(XMLParser.isValid(message)){
+                      topicToSocketBrocker.writeMessageInTopic(message, id);
+                    } else {
+                      writeMessage(notValidMessageTemplate);
+                    }
                 } catch (JMSException e) {
                     e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }

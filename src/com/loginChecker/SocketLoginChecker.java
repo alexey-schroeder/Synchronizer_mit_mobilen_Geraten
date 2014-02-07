@@ -47,7 +47,6 @@ public class SocketLoginChecker extends LoginChecker {
                 MobileClientWithSocket mobileClientWithSocket = new MobileClientWithSocket(socket);
                 mobileClientWithSocket.setMobileClientId(id);
                 topicToSocketBrocker.addClient(mobileClientWithSocket);
-
             } else {
                 out.println(loginFailedAnswerTemplate);
                 out.flush();
