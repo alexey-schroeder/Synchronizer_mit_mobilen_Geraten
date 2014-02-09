@@ -46,6 +46,7 @@ public class XMLParser {
     }
 
     public  static boolean isValid(String xmlAsString){
+        System.out.println("Message wird geprüft:" + xmlAsString);
         if(xmlAsString.isEmpty()){
             return false;
         }
