@@ -15,7 +15,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -62,7 +61,8 @@ public class XMLParser {
         } catch (SAXException e) {
             System.out.println("XML is not valid: " + xmlAsString);
             return false;
-        } catch (IOException e) {
+        } catch (Exception e) {
+            System.out.println("Unbekanntes Fehler (Vermutlich ein Umlaut-Zeichen in XML)");
             return false;
         }
         Element root =  xmlDocument.getDocumentElement();
