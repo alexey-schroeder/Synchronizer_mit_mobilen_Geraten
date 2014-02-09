@@ -4,6 +4,7 @@
  */
 package com.parsers;
 
+import com.logger.Logger;
 import com.messages.Message;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -15,8 +16,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 
 /**
  *
@@ -40,13 +40,13 @@ public class XMLParser {
             }
             return message;
         } catch (Exception ex) {
-            Logger.getLogger(XMLParser.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.log(ex.getStackTrace().toString());
         }
         return null;
     }
 
     public  static boolean isValid(String xmlAsString){
-        System.out.println("Message wird geprüft:" + xmlAsString);
+        Logger.log("Message wird geprüft:" + xmlAsString);
         if(xmlAsString.isEmpty()){
             return false;
         }
@@ -60,13 +60,40 @@ public class XMLParser {
         try {
             xmlDocument = newDocumentBuilder.parse(new ByteArrayInputStream(xmlAsString.getBytes()));
         } catch (SAXException e) {
-            System.out.println("XML is not valid: " + xmlAsString);
+            Logger.log("XML is not valid: " + xmlAsString);
             return false;
         } catch (Exception e) {
-            System.out.println("Unbekanntes Fehler (Vermutlich ein Umlaut-Zeichen in XML)");
+            Logger.log("Unbekanntes Fehler (Vermutlich ein nicht UTF8-Zeichen in XML)");
             return false;
         }
         Element root =  xmlDocument.getDocumentElement();
         return true;
+    }
+
+    public static String replaceUmlaut(String input) {
+
+        //replace all lower Umlauts
+        String o_strResult =
+                input
+                        .replaceAll("ü", "ue")
+                        .replaceAll("ö", "oe")
+                        .replaceAll("ä", "ae")
+                        .replaceAll("ß", "ss");
+
+        //first replace all capital umlaute in a non-capitalized context (e.g. Übung)
+        o_strResult =
+                o_strResult
+                        .replaceAll("Ü(?=[a-zäöüß ])", "Ue")
+                        .replaceAll("Ö(?=[a-zäöüß ])", "Oe")
+                        .replaceAll("Ä(?=[a-zäöüß ])", "Ae");
+
+        //now replace all the other capital umlaute
+        o_strResult =
+                o_strResult
+                        .replaceAll("Ü", "Ue")
+                        .replaceAll("Ö", "Oe")
+                        .replaceAll("Ä", "Ae");
+
+        return o_strResult;
     }
 }

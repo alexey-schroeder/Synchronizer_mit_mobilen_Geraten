@@ -1,5 +1,6 @@
 package com.synchronizer;
 
+import com.logger.Logger;
 import com.topicAgent.TopicToSocketBrocker;
 import org.glassfish.tyrus.server.Server;
 
@@ -39,7 +40,7 @@ public class Synchronizer {
     }
 
     private void startWebSocketServer() throws DeploymentException {
-        System.out.println("Starte WebServerSocket on socketPort " + webSocketPort);
+        Logger.log("Starte WebServerSocket on socketPort " + webSocketPort);
         Server server = new Server("localhost", 2222, "", WebSocketServerEndPoint.class);
         server.start();
     }

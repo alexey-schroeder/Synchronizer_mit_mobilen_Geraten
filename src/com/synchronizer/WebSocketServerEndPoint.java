@@ -2,6 +2,7 @@ package com.synchronizer;
 
 import com.client.MobileClient;
 import com.client.MobileClientWithWebSocket;
+import com.logger.Logger;
 import com.loginChecker.WebSocketLoginChecker;
 import com.parsers.XMLParser;
 import com.topicAgent.TopicToSocketBrocker;
@@ -27,18 +28,18 @@ public class WebSocketServerEndPoint {
     private MobileClientWithWebSocket clientWithWebSocket;
 
     public WebSocketServerEndPoint() {
-        System.out.println("Endpoint startet");
+        Logger.log("Endpoint startet");
     }
 
     @OnOpen
     public void onOpen(Session session, EndpointConfig conf) {
         this.session = session;
-        System.out.println("websocket session opened: " + session);
+        Logger.log("websocket session opened: " + session);
     }
 
     @OnMessage
     public void onMessage(Session session, String text) {
-        System.out.println("message from websocket: " + text);
+        Logger.log("message from websocket: " + text);
         if (!isLoged && firstChecking) {
             firstChecking = false;
             WebSocketLoginChecker webSocketLoginChecker = new WebSocketLoginChecker(session, TopicToSocketBrocker.getInstance());
@@ -47,6 +48,7 @@ public class WebSocketServerEndPoint {
             webSocketLoginChecker.start();
         } else if (isLoged) {
             try {
+                text = XMLParser.replaceUmlaut(text);
                 if(XMLParser.isValid(text)){
                 TopicToSocketBrocker.getInstance().writeMessageInTopic(text, clientId);
                 } else {
@@ -61,7 +63,7 @@ public class WebSocketServerEndPoint {
     @OnClose
     public void onClose(Session session) {
         try {
-            System.out.println("Session for client " + clientId + " closed");
+            Logger.log("Session for client " + clientId + " closed");
             TopicToSocketBrocker.getInstance().removeMobileClient(clientId, clientWithWebSocket);
             session.close();
         } catch (IOException e) {

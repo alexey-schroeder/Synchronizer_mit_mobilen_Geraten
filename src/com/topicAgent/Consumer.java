@@ -1,5 +1,6 @@
 package com.topicAgent;
 
+import com.logger.Logger;
 import com.parsers.XMLParser;
 import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
@@ -37,7 +38,7 @@ public class Consumer  extends Thread{
             while (!quit) {
                 Message jmsMessage = consumer.receive();
                 if(jmsMessage != null){
-                System.out.println("aus topic wurde von consumer mit id = " + id + " folgendes message gelesen" +((TextMessage) jmsMessage).getText());
+                Logger.log("aus topic wurde von consumer mit id = " + id + " folgendes message gelesen" + ((TextMessage) jmsMessage).getText());
                 }
                 if (!quit && jmsMessage instanceof TextMessage) { // weil in receive hängt der client, bracked kann kommen, aber der client bekommt es nicht mit
                     TextMessage textMessage = (TextMessage) jmsMessage;

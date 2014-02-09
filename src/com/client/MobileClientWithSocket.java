@@ -59,6 +59,7 @@ public class MobileClientWithSocket extends MobileClient{
             String message = readMessage();
             if(!quit){
                 try {
+                    message = XMLParser.replaceUmlaut(message);
                     if(XMLParser.isValid(message)){
                       topicToSocketBrocker.writeMessageInTopic(message, id);
                     } else {

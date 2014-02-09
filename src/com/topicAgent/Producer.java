@@ -1,5 +1,6 @@
 package com.topicAgent;
 
+import com.logger.Logger;
 import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
 
@@ -28,7 +29,7 @@ public class Producer {
     }
 
     public void start() throws JMSException {
-        System.out.println("Starte producer for ActiveMQ");
+        Logger.log("Starte producer for ActiveMQ");
         ConnectionFactory connectionFactory =  new ActiveMQConnectionFactory(url);
         Connection connection = connectionFactory.createConnection();
         connection.start();

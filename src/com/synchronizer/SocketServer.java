@@ -1,5 +1,6 @@
 package com.synchronizer;
 
+import com.logger.Logger;
 import com.loginChecker.LoginChecker;
 import com.loginChecker.SocketLoginChecker;
 import com.topicAgent.TopicToSocketBrocker;
@@ -24,19 +25,19 @@ public class SocketServer extends Thread {
 
     @Override
     public void run() {
-        System.out.println("Starte ServerSocket on socketPort " + socketPort);
+        Logger.log("Starte ServerSocket on socketPort " + socketPort);
         ServerSocket serverSocket = null;
         try {
             serverSocket = new ServerSocket(socketPort);
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
-        System.out.println("SocketServer startet on socketPort " + socketPort);
+        Logger.log("SocketServer startet on socketPort " + socketPort);
         while(true){
             Socket client = null;
             try {
                 client = serverSocket.accept();
-                System.out.println("New Connection");
+                Logger.log("New Connection");
                 LoginChecker loginChecker = new SocketLoginChecker(client, topicToSocketBrocker);
                 loginChecker.start();
             } catch (IOException e) {

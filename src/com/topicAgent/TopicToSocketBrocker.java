@@ -1,6 +1,7 @@
 package com.topicAgent;
 
 import com.client.MobileClient;
+import com.logger.Logger;
 import com.security.SecurityInspector;
 
 import javax.jms.JMSException;
@@ -55,7 +56,7 @@ public class TopicToSocketBrocker {
                 consumers.remove(clientId);
             }
         }
-        System.out.println("Client " + clientId + " disconected");
+        Logger.log("Client " + clientId + " disconected");
     }
 
     public void addClient(MobileClient client) throws JMSException {
@@ -73,7 +74,7 @@ public class TopicToSocketBrocker {
         client.setTopicToSocketBrocker(this);
         client.start();
 
-        System.out.println("New client added. Client id = " + clientId);
+        Logger.log("New client added. Client id = " + clientId);
     }
 
     public void setSecurityInspector(SecurityInspector securityInspector) {
@@ -83,7 +84,7 @@ public class TopicToSocketBrocker {
     public void writeMessageInTopic(String message, String clientId) throws JMSException {
         if (securityInspector.canClientWriteInTopic(clientId)) {
             producer.send(message);
-            System.out.println("topicToSocket brocker hat in Topic folgendes Message gepostet: \n" + message);
+            Logger.log("topicToSocket brocker hat in Topic folgendes Message gepostet: \n" + message);
         }
     }
 

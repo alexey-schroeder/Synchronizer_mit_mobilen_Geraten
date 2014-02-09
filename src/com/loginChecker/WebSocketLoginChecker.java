@@ -36,6 +36,7 @@ public class WebSocketLoginChecker extends LoginChecker {
 
     @Override
     public void run() {
+        loginInfo = XMLParser.replaceUmlaut(loginInfo);
         if(!XMLParser.isValid(loginInfo)){
             webSocketSession.getAsyncRemote().sendText(MobileClient.notValidMessageTemplate);
             return;
