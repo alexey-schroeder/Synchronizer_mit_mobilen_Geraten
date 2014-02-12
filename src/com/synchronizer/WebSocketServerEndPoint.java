@@ -49,8 +49,8 @@ public class WebSocketServerEndPoint {
         } else if (isLoged) {
             try {
                 text = XMLParser.replaceUmlaut(text);
-                if(XMLParser.isValid(text)){
-                TopicToSocketBrocker.getInstance().writeMessageInTopic(text, clientId);
+                if (XMLParser.isValid(text)) {
+                    TopicToSocketBrocker.getInstance().writeMessageInTopic(text, clientId);
                 } else {
                     session.getAsyncRemote().sendText(MobileClient.notValidMessageTemplate);
                 }

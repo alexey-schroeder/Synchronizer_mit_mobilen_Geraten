@@ -54,6 +54,7 @@ public class TopicToSocketBrocker {
                 Consumer consumer = consumers.get(clientId);
                 consumer.breakJob();
                 consumers.remove(clientId);
+                mobileClients.remove(clientId);
             }
         }
         Logger.log("Client " + clientId + " disconected");

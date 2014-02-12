@@ -7,10 +7,10 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 
 import javax.jms.*;
 
-public class Consumer  extends Thread{
+public class Consumer extends Thread {
     // URL of the JMS server
     private static String url = ActiveMQConnection.DEFAULT_BROKER_URL;
-    private  String id;
+    private String id;
     // Name of the queue we will receive messages from
     private static String subject = "Werkstatt1";
     private boolean quit;
@@ -18,11 +18,12 @@ public class Consumer  extends Thread{
     private Session session;
     private Connection connection;
     private MessageConsumer consumer;
+
     public Consumer(String id) {
         this.id = id;
     }
 
-    public void run()  {
+    public void run() {
         ConnectionFactory connectionFactory
                 = new ActiveMQConnectionFactory(url);
         try {
@@ -34,13 +35,13 @@ public class Consumer  extends Thread{
             Topic destination = session.createTopic(subject);
 
             consumer = session.createDurableSubscriber(destination, id);
-
+            Logger.log("Topic-Consumer für Client id = " + id + " erstellt und gestartet");
             while (!quit) {
                 Message jmsMessage = consumer.receive();
-                if(jmsMessage != null){
-                Logger.log("aus topic wurde von consumer mit id = " + id + " folgendes message gelesen" + ((TextMessage) jmsMessage).getText());
+                if (jmsMessage != null) {
+                    Logger.log("aus topic wurde von consumer mit id = " + id + " folgendes message gelesen" + ((TextMessage) jmsMessage).getText());
                 }
-                if (!quit && jmsMessage instanceof TextMessage) { // weil in receive hängt der client, bracked kann kommen, aber der client bekommt es nicht mit
+                if (!quit && jmsMessage instanceof TextMessage) { // weil in receive hängt der client, befehl  "quit" kann kommen, aber der client bekommt es nicht mit
                     TextMessage textMessage = (TextMessage) jmsMessage;
                     com.messages.Message message = XMLParser.getMessageFromXML(textMessage.getText());
                     if (id.equals(message.get("idTo"))) {
@@ -65,8 +66,6 @@ public class Consumer  extends Thread{
             connection.stop();
             consumer.close();
             session.close();
-//            connection.stop();
-//            connection.close();
         } catch (JMSException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
