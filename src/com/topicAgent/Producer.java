@@ -32,8 +32,11 @@ public class Producer {
         Logger.log("Starte producer for ActiveMQ");
         ConnectionFactory connectionFactory =  new ActiveMQConnectionFactory(url);
         Connection connection = connectionFactory.createConnection();
+        System.out.println("Connection to ActiveMQ created");
         connection.start();
+        System.out.println("Connection to ActiveMQ startet");
         session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        System.out.println("Session for ActiveMQ startet");
         Destination destination = session.createTopic(topicName);
         producer = session.createProducer(destination);
         Logger.log("MessageProducer for ActiveMQ created");
