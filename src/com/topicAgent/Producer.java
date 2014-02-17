@@ -36,6 +36,7 @@ public class Producer {
         session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         Destination destination = session.createTopic(topicName);
         producer = session.createProducer(destination);
+        Logger.log("MessageProducer for ActiveMQ created");
     }
 
     public void send(String text) throws JMSException {
